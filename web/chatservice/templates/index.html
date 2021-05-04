@@ -4,8 +4,7 @@
 <html>
     <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no"><link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
         <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
@@ -13,7 +12,12 @@
         <!------ Include the above in your HEAD tag ---------->
         <link href='https://fonts.googleapis.com/css?family=Niramit' rel='stylesheet'>
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
-        <link rel="icon" href="https://static.thenounproject.com/png/29964-200.png">
+        
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.3.1/js/bootstrap.bundle.min.js"></script>
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
         <title>
             Chat Messaging
@@ -23,23 +27,63 @@
         {% if sessionId %}
             <input type="hidden" id="sessionId" name="sessionId" value="{{sessionId}}">
         {% endif %}
+        {% csrf_token %}
         <input type="hidden" id="sessionId" name="sessionId" value="{{sessionId}}">
-        <div class="col-sm-3 col-sm-offset-4 frame">
-            <ul>
-            </ul>
-            <div>
-                <div class="msj-rta macro">                        
-                    <div class="text text-r" style="background:whitesmoke !important">
-                        {% csrf_token %}
-                        <input class="mytext" id="message" name="message" placeholder="Type a message"/>
-                    </div> 
-
+        <div class="container py-5 px-4">
+            <!-- For demo purpose-->
+            <header class="text-center">
+              <h1 class="display-4 text-white">Bootstrap Chat</h1>
+              <p class="text-white lead mb-0">An elegant chat widget compatible with Bootstrap 4</p>
+              <p class="text-white lead mb-4">Snippet by
+                <a href="https://bootstrapious.com" class="text-white">
+                  <u>Bootstrapious</u></a>
+              </p>
+            </header>
+          
+            <div class="row rounded-lg overflow-hidden shadow">
+              
+              <!-- Chat Box-->
+              <div class="col-12 px-0">
+                <div class="bg-gray px-4 py-2 bg-light">
+                    <p class="h5 mb-0 py-1">Chat</p>
+                  </div>
+                <div class="px-4 py-5 chat-box bg-white" id="chat-content">
+                  <!-- Sender Message-->
+                  <div class="media w-50 mb-3">
+                    <img src="" alt="userid: 171717" width="50" class="rounded-circle">
+                    <div class="media-body ml-3">
+                      <div class="bg-light rounded py-2 px-3 mb-2">
+                        <p class="text-small mb-0 text-muted">Test which is a new approach all solutions</p>
+                      </div>
+                      <p class="small text-muted">12:00 PM | Aug 13</p>
+                    </div>
+                  </div>
+          
+                  <!-- Reciever Message-->
+                  <div class="media w-50 ml-auto mb-3">
+                    <div class="media-body">
+                      <div class="bg-primary rounded py-2 px-3 mb-2">
+                        <p class="text-small mb-0 text-white">Test which is a new approach to have all solutions</p>
+                      </div>
+                      <p class="small text-muted">12:00 PM | Aug 13</p>
+                    </div>
+                  </div>
+          
                 </div>
-                <div style="padding:10px;">
-                    <span class="glyphicon glyphicon-share-alt"></span>
-                </div>                
+          
+                <!-- Typing area -->
+                <div class="bg-light">
+                  <div class="input-group">
+                    <input type="text" id="message" name="message" placeholder="Type a message" aria-describedby="button-addon2" class="mytext form-control rounded-0 border-0 py-4 bg-light">
+                    <div class="input-group-append">
+                      <button id="sendMessage" type="submit" class="btn btn-link"> <i class="fa fa-paper-plane"></i></button>
+                    </div>
+                  </div>
+                </div>
+          
+              </div>
             </div>
-        </div>      
+          </div>  
         <script>
             var me = {};
 
@@ -49,10 +93,10 @@
             
             $(".mytext").on("keydown", function(e){
                 if (e.which == 13){
-                    var text = $(this).val();
+                    var text = $("#message").val();
                     if (text !== ""){
                         sendMessage(e);            
-                        $(this).val('');
+                        $("#message").val('');
                     }
                 }
             });
@@ -102,6 +146,19 @@
                 alert("WebSocket NOT supported by your Browser!");
                 }
             }
+            $(function(){
+                $(".heading-compose").click(function() {
+                $(".side-two").css({
+                    "left": "0"
+                });
+                });
+
+                $(".newMessage-back").click(function() {
+                $(".side-two").css({
+                    "left": "-100%"
+                });
+                });
+            }) 
                         
 
             function formatAMPM(date) {
@@ -124,28 +181,28 @@
                 var date = formatAMPM(new Date());
                 
                 if (who == "me"){       
-                    control = '<li style="width:100%;">' +
-                                    '<div class="msj-rta macro">' +
-                                        '<div class="text text-r">' +
-                                            '<p><b>User Id: '+sessionId+'</b></p>' +
-                                            '<p>'+text+'</p>' +
-                                            '<p><small>'+date+'</small></p>' +
-                                        '</div>' +                         
-                            '</li>';             
+                    control = '<div class="media w-50 ml-auto mb-3">' +
+                    '<div class="media-body">' +
+                      '<div class="bg-primary rounded py-2 px-3 mb-2">' +
+                        '<p class="text-small mb-0 text-white">' + text + '</p>' +
+                      '</div>' +
+                      '<p class="small text-muted">' + date + '</p>' + 
+                    '</div>' + 
+                  '</div>';          ;
                 }else{
-                    control = '<li style="width:100%">' +
-                                    '<div class="msj macro">' +
-                                        '<div class="text text-l">' +
-                                            '<p><b>User Id: '+sessionId+'</b></p>' +
-                                            '<p>'+ text +'</p>' +
-                                            '<p><small>'+date+'</small></p>' +
-                                        '</div>' +
+                    control = '<div class="media w-50 mb-3">' +
+                                    '<img src="" alt="userid: ' + sessionId + '" width="50" class="rounded-circle">' +
+                                    '<div class="media-body ml-3">' + 
+'                                    <div class="bg-light rounded py-2 px-3 mb-2">' +
+                                        '<p class="text-small mb-0 text-muted">' + text + '</p>' +
                                     '</div>' +
-                                '</li>';
+                                    '<p class="small text-muted">' + date + '</p>' +
+                                    '</div>' +
+                                '</div>';
                 }
                 setTimeout(
                     function(){                        
-                        $("ul").append(control).scrollTop($("ul").prop('scrollHeight'));
+                        $("#chat-content").append(control).scrollTop($("#chat-content").prop('scrollHeight'));
                     }, time);
                 
             }
