@@ -93,12 +93,10 @@
                     var on_message_display = function(m) {
                         message = JSON.parse(m.body);
                         sessionId = $("#sessionId").val();
-                        console.log("Session Id html: " + sessionId);
-                        console.log("Session Id rabbitmq: " + message.sessionId);
                         if (sessionId == message.sessionId) {
-                            insertChat("me", message.message, 0);
+                            insertChat("me", message.message, 0, sessionId);
                         } else {
-                            insertChat("you", message.message,0);
+                            insertChat("you", message.message,0, message.sessionId);
                         }
                     };
 
@@ -123,7 +121,7 @@
             }            
 
             //-- No use time. It is a javaScript effect.
-            function insertChat(who, text, time){
+            function insertChat(who, text, time, sessionId){
                 if (time === undefined){
                     time = 0;
                 }
@@ -134,16 +132,16 @@
                     control = '<li style="width:100%;">' +
                                     '<div class="msj-rta macro">' +
                                         '<div class="text text-r">' +
+                                            '<p><b>User Id: '+sessionId+'</b></p>' +
                                             '<p>'+text+'</p>' +
                                             '<p><small>'+date+'</small></p>' +
-                                        '</div>' +
-                                    '<div class="avatar" style="padding:0px 0px 0px 10px !important"><img class="img-circle" style="width:100%;" src="'+me.avatar+'" /></div>' +                                
+                                        '</div>' +                         
                             '</li>';             
                 }else{
                     control = '<li style="width:100%">' +
                                     '<div class="msj macro">' +
-                                    '<div class="avatar"><img class="img-circle" style="width:100%;" src="'+ you.avatar +'" /></div>' +
                                         '<div class="text text-l">' +
+                                            '<p><b>User Id: '+sessionId+'</b></p>' +
                                             '<p>'+ text +'</p>' +
                                             '<p><small>'+date+'</small></p>' +
                                         '</div>' +
