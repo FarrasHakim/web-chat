@@ -1,0 +1,164 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.6.0.js" integrity="sha256-H+K7U5CnXl1h5ywQfKtSj8PCmoN9aaq30gDh27Xc0jk=" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.1.4/sockjs.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+        <!------ Include the above in your HEAD tag ---------->
+        <link href='https://fonts.googleapis.com/css?family=Niramit' rel='stylesheet'>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+        <link rel="icon" href="https://static.thenounproject.com/png/29964-200.png">
+        <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <title>
+        </title>
+    </head>
+    
+    <body>
+        <div class="col-sm-3 col-sm-offset-4 frame">
+            <ul></ul>
+            {% if sessionId %}
+                <input type="hidden" id="sessionId" name="sessionId" value="{{sessionId}}">
+            {% endif %}
+            <div>
+                <div class="msj-rta macro" style="margin:auto">                        
+                    <div class="text text-r" style="background:whitesmoke !important">
+                        {% csrf_token %}
+                        <input class="mytext" id="message" name="message" placeholder="Type a message"/>
+                    </div> 
+                </div>
+            </div>
+        </div>
+        <script >
+            var me = {};
+
+            var you = {};
+
+            WebSocketTest();
+            
+            $(".mytext").on("keyup", function(e){
+                if (e.which == 13){
+                    var text = $(this).val();
+                    if (text !== ""){
+                        sendMessage(e);
+                        $('#message').val("");
+                    }
+                }
+            });
+
+            var sendMessage = function(event) {
+                console.log($('#message').val());
+                console.log(event);
+                $.ajax({
+                    url : '/',
+                    type: 'POST',
+                    data: {
+                        message : $('#message').val(),
+                        csrfmiddlewaretoken : $('input[name=csrfmiddlewaretoken]').val(),
+                    },
+                    success : function(response) {
+                        console.log(response);
+                    }
+                });
+            }
+
+            function WebSocketTest() {
+                        
+                if ("WebSocket" in window) {
+                    var ws_stomp_display     = new WebSocket('ws://127.0.0.1:15674/ws');
+                    var client_display = Stomp.over(ws_stomp_display);
+                    var mq_queue_display    = "/exchange/chatmessage/stream";
+
+                    var on_connect_display = function() {
+                        console.log('connecting...');
+                        client_display.subscribe(mq_queue_display, on_message_display);
+                    };
+
+                    var on_error_display =  function() {
+                        console.log('error');
+                    };
+
+                    var on_message_display = function(m) {
+                        message = JSON.parse(m.body);
+                        sessionId = $("#sessionId").val();
+
+                        if (sessionId == message.sessionId) {
+                            insertChat("me", message.message, 0);
+                        } else {
+                            insertChat("you", message.message,0);
+                        }
+                    };
+
+                    client_display.connect('guest', 'guest', on_connect_display, on_error_display, '/');
+
+                } else {
+                // The browser doesn't support WebSocket
+                alert("WebSocket NOT supported by your Browser!");
+                }
+            }
+
+            function formatAMPM(date) {
+                var hours = date.getHours();
+                var minutes = date.getMinutes();
+                var ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12; // the hour '0' should be '12'
+                minutes = minutes < 10 ? '0'+minutes : minutes;
+                var strTime = hours + ':' + minutes + ' ' + ampm;
+                return strTime;
+            }            
+
+            //-- No use time. It is a javaScript effect.
+            function insertChat(who, text, time = 0){
+                var control = "";
+                var date = formatAMPM(new Date());
+                
+                if (who == "me"){                    
+                    control = '<li style="width:100%;">' +
+                                    '<div class="msj-rta macro">' +
+                                        '<div class="text text-r">' +
+                                            '<p>'+text+'</p>' +
+                                            '<p><small>'+date+'</small></p>' +
+                                        '</div>' +
+                                    '<div class="avatar" style="padding:0px 0px 0px 10px !important"></div>' +                                
+                            '</li>';
+                }else{
+                    control = '<li style="width:100%">' +
+                                    '<div class="msj macro">' +
+                                        '<div class="text text-l">' +
+                                            '<p>'+ text +'</p>' +
+                                            '<p><small>'+date+'</small></p>' +
+                                        '</div>' +
+                                    '</div>' +
+                                '</li>';     
+                }
+                setTimeout(
+                    function(){                        
+                        $("ul").append(control);
+
+                    }, time);
+                
+            }
+
+            function resetChat(){
+                $("ul").empty();
+            }
+
+            //-- Clear Chat
+            resetChat();
+
+            //-- Print Messages
+            // insertChat("me", "Hello Tom...", 0);  
+            // insertChat("you", "Hi, Pablo", 1500);
+            // insertChat("me", "What would you like to talk about today?", 3500);
+            // insertChat("you", "Tell me a joke",7000);
+            // insertChat("me", "Spaceman: Computer! Computer! Do we bring battery?!", 9500);
+            // insertChat("you", "LOL", 12000);
+        </script>
+    </body>
+</html>
