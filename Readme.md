@@ -15,6 +15,12 @@ Cara menjalankan:
 6. Masuk ke folder web
 7. Jalankan `python manage.py runserver`
 
+
+Cara kerja aplikasi web server:
+- Saat pengguna mengirim text message, backend akan publish message tersebut ke queue di rabbitmq
+- Saat di queue tersebut ada message yang masuk, frontend akan consume message tersebut karena sudah subscribe ke queue tersebut
+- Dalam message tersebut terdapat sessionId pengirim dan messagenya sehingga frontend dapat membedakan mana message dari pengirim dan mana message yang dari pengguna dan message tersebut akan ditampilkan dengan tmapilan yang sesuai dengan pengirimnya
+
 ### 2. Jam Service 
 
 Cara menjalankan:
@@ -23,8 +29,8 @@ Cara menjalankan:
 2. Pastikan python dan rabbitmq dapat dipanggil dari terminal
 3. Nyalakan rabbitmq
 4. Jalankan syntax `python jam-service.py`
-   
-### Cara kerja aplikasi:
-- Saat pengguna mengirim text message, backend akan publish message tersebut ke queue di rabbitmq
-- Saat di queue tersebut ada message yang masuk, frontend akan consume message tersebut karena sudah subscribe ke queue tersebut
-- Dalam message tersebut terdapat sessionId pengirim dan messagenya sehingga frontend dapat membedakan mana message dari pengirim dan mana message yang dari pengguna dan message tersebut akan ditampilkan dengan tmapilan yang sesuai dengan pengirimnya
+
+Cara kerja aplikasi jam service:
+- Program akan mengirimkan data waktu dengan format `YYYY-MM-DD hh:mm:ss`
+- Data akan dikirimkan ke exchange `/time/timequeue/timequeue`
+- Data dikirimkan setiap menit ke queue

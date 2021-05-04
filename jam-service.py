@@ -8,11 +8,17 @@ connection = pika.BlockingConnection(
     pika.ConnectionParameters(host='localhost'))
 channel = connection.channel()
 
-channel.queue_declare(queue='time')
+exchangemq = "time"
+queueName = "timequeue"
+channel.exchange_declare(exchange=exchangemq, exchange_type='direct', durable=True)
+channel.queue_declare(queue=queueName, durable=True)
+channel.queue_bind(queueName, exchangemq)
 
 while True:
     message = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    channel.basic_publish(exchange='', routing_key='time', body=message)
+    channel.basic_publish(exchange=exchangemq,
+                        routing_key=queueName,
+                        body=message)
     print(" [x] Sent %r" % message)
     time.sleep(60) # sleep 1 minute
 
